@@ -10,8 +10,9 @@ webscan.py <api> url result.txt
 
 ## APIs:
 
-aizhan		From dns.aizhan.com
-bing		From www.bing.com
+aizhan
+
+bing
 
 ## Requirement
 
