@@ -1,5 +1,6 @@
 # -*- coding:utf-8 -*-
 
+import socket
 import requests
 from pyquery import PyQuery as pq
 import re
@@ -24,24 +25,25 @@ __        __   _    ____
                 -- Find the same IP site
 		'''
 		print 'Usage:'
-		print '    webscan.py url'
-		print '    webscan.py url result.txt'
+		print '    webscan.py <api> url'
+		print '    webscan.py <api> url result.txt'
+		print
+		print 'APIs:'
+		print '    aizhan    From dns.aizhan.com'
+		print '    bing      From www.bing.com'
 
-	def scan_url(self,url):
+	def aizhan_api(self,url):
 
 		if re.match(r'^http.*',url):
 			url = url.split('//')[1]
 
 		r = requests.get('http://dns.aizhan.com/{0}/'.format(url))
-
 		doc = pq(r.text)
 
-		for i in doc('ul.clearfix').items():
-
-			self.domain_info['domain'] = i('li')('strong.blue').text()
-			self.domain_info['ip'] = i('li')('strong.red').text()
-			self.domain_info['place'] =  i('li')('strong').eq(2).text()
-			self.domain_info['number'] =  i('li')('span.red').text()
+		self.domain_info['domain'] = url
+		self.domain_info['ip'] = doc('ul.clearfix')('li')('strong.red').text()
+		self.domain_info['place'] = doc('ul.clearfix')('li')('strong').eq(2).text()
+		self.domain_info['number'] = doc('ul.clearfix')('li')('span.red').text()
 
 		for x in doc('.pager')('ul')('li')('a').items():
 
@@ -53,11 +55,39 @@ __        __   _    ____
 					d = pq(resp.text)
 
 					for y in d('.table')('a').items():
-						self.url_list.append(y.attr.href)
+						self.url_list.append('http://'+y.attr.href+'/')
 				else:
 					return 0
 
-	def scan_result(self):
+	def bing_api(self,url):
+
+		if re.match(r'^http.*',url):
+			url = url.split('//')[1]
+
+		r = requests.get('http://www.bing.com/search?q=ip:{0}'.format(socket.gethostbyname(url)))
+		doc = pq(r.text)
+
+		self.domain_info['domain'] = url
+		self.domain_info['ip'] = socket.gethostbyname(url)
+		self.domain_info['place'] = doc('div').filter('.b_xlText').text()
+		self.domain_info['number'] = doc('span').filter('.sb_count').text()
+
+		for x in doc('ul').filter('.sb_pagF')('li')('a').items():
+
+			if not x.attr.href == None:
+				print '[+] Get',len(self.url_list),'urls'
+
+				if raw_input('next?') in ['yes','y']:
+					resp = requests.get('http://www.bing.com/{0}'.format(x.attr.href.replace('%3a',':')))
+					d = pq(resp.text)
+
+					for y in d('cite').items():
+						self.url_list.append('http://'+y.text().split('/')[0]+'/')
+				else:
+					return 0
+
+
+	def result(self):
 
 		print '[*] Domain:',self.domain_info['domain']
 		print '[*] IP:',self.domain_info['ip']
@@ -69,7 +99,7 @@ __        __   _    ____
 
 			print u
 
-	def save_result(self,filename):
+	def save(self,filename):
 
 		with open(filename,'w') as f:
 
@@ -79,7 +109,7 @@ __        __   _    ____
 			f.write('\n')
 			f.write('Place: '+self.domain_info['place'].encode('utf-8'))
 			f.write('\n')
-			f.write('Number: '+self.domain_info['number'])
+			f.write('Number: '+self.domain_info['number'].encode('utf-8'))
 			f.write('\n')
 			f.write('\n')
 
@@ -94,18 +124,25 @@ def main():
 
 	scan = WebScan()
 
-	if len(sys.argv) == 2:
-
-		scan.scan_url(sys.argv[1])
-		scan.scan_result()
-
-	elif len(sys.argv) == 3:
-		
-		scan.scan_url(sys.argv[1])
-		scan.save_result(sys.argv[2])
-
+	if len(sys.argv)==3:
+		if sys.argv[1] == 'aizhan':
+			scan.aizhan_api(sys.argv[2])
+		elif sys.argv[1] == 'bing':
+			scan.bing_api(sys.argv[2])
+		else:
+			print 'API Error'
+		scan.result()
+	elif len(sys.argv)==4:
+		if sys.argv[1] == 'aizhan':
+			scan.aizhan_api(sys.argv[2])
+		elif sys.argv[1] == 'bing':
+			scan.bing_api(sys.argv[2])
+		else:
+			print 'API Error'
+		scan.save(sys.argv[3])
 	else:
 		scan.usage()
+
 
 if __name__ == '__main__':
 

@@ -4,9 +4,14 @@
 
 ## Usage:
 
-webscan.py url
+webscan.py <api> url
 
-webscan.py url result.txt
+webscan.py <api> url result.txt
+
+## APIs:
+
+aizhan		From dns.aizhan.com
+bing		From www.bing.com
 
 ## Requirement
 
