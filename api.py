@@ -42,5 +42,3 @@ class WebScan(object):
 						result.append({'url':url,'title':y.text()})
 
 		return result
-
-x = WebScan()
