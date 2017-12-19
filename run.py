@@ -10,13 +10,11 @@ app = Flask(__name__)
 scan = WebScan()
 
 success = None
-result = None
 
 @app.route('/')
 def index():
 
     global success
-    global result
 
     if request.args.get('a'):
         url = request.args.get('site').strip()
@@ -31,10 +29,7 @@ def index():
     elif request.args.get('d'):
         url = request.args.get('site').strip()
         server = scan.server(url)
-        if result:
-            return render_template('index.html',success=success,url=url,server=server,result=result)
-        else:
-             return render_template('index.html',success=success,url=url,server=server)
+        return render_template('index.html',success=success,url=url,server=server)
 
     else:
         return render_template('index.html')
