@@ -42,3 +42,6 @@ class WebScan(object):
 						result.append({'url':url,'title':y.text()})
 
 		return result
+		
+	def server(self,url):
+		return requests.head('http://' + url).headers['Server']

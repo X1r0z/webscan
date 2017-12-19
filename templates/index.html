@@ -62,7 +62,15 @@
 		</form>
 		{% if success %}
 			<div class="alert alert-info text-center" role="alert">
-			<strong>Success!</strong> <strong>IP</strong>: {{success.ip}} <strong>查询IP段</strong>: {{success.ip_segment}} <strong>位置</strong>: {{success.place}}
+			<strong>IP</strong>: {{success.ip}} <strong>查询IP段</strong>: {{success.ip_segment}} <strong>位置</strong>: {{success.place}}
+			</div>
+		{% else %}
+			<div></div>
+		{% endif %}
+		
+		{% if server %}
+			<div class="alert alert-success text-center" role="alert">
+			<strong>Server</strong>: {{server}}
 			</div>
 		{% else %}
 			<div></div>
