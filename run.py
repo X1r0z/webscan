@@ -44,16 +44,5 @@ def contact():
 
     return render_template('contact.html')
 
-@app.route('/api')
-def api():
-
-    if request.args.get('site'):
-
-        url = request.args.get('site')
-        result = scan.api(url)
-        return dumps(result)
-
-    return render_template('api.html')
-
 if __name__ == '__main__':
     app.run(host='0.0.0.0',port=80)
